@@ -81,11 +81,13 @@ func main() {
 				}
 			}
 
-			destFilePath := filepath.Join(destDir, replaceMovWithMp4(e.Name()))
-			debugString := []string{"ffmpeg", "-i", inputFilepath, "-vcodec", "h264", "-preset", "medium", "-crf", "23", "-c:a", "aac", "-b:a", "64k", "-ac", "2", destFilePath}
+			destFilepath := filepath.Join(destDir, replaceMovWithMp4(e.Name()))
+
+			debugString := []string{"ffmpeg"}
+			debugString = append(debugString, toMp4WithoutSizeCompressionArgs(inputFilepath, destFilepath)...)
 			fmt.Printf("Debug command: \n%s\n", strings.Join(debugString, " "))
 
-			convertVideoCmd := exec.Command("ffmpeg", "-i", inputFilepath, "-vcodec", "h264", "-preset", "medium", "-crf", "23", "-c:a", "aac", "-b:a", "64k", "-ac", "2", destFilePath)
+			convertVideoCmd := exec.Command("ffmpeg", toMp4WithoutSizeCompressionArgs(inputFilepath, destFilepath)...)
 
 			stderr, err := convertVideoCmd.StderrPipe()
 			if err != nil {
@@ -108,7 +110,7 @@ func main() {
 			// 	fmt.Println("Error convert video:", err.Error())
 			// 	return
 			// }
-			fmt.Printf("=====\nCompleted:\n%s\n->\n%s\n=====\n", input, destFilePath)
+			fmt.Printf("=====\nCompleted:\n%s\n->\n%s\n=====\n", input, destFilepath)
 		}
 	} else {
 		if filepath.Ext(input) != ".mov" {
